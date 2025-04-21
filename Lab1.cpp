@@ -304,6 +304,78 @@ MatrixS multiplicar_strassen(const MatrixS& A, const MatrixS& B) {
     return C;
 }
 
+MatrixS multiplicar_recursivo_paralelo(const MatrixS& A, const MatrixS& B) {
+    int size = A.size();
+    MatrixS C(size, vector<int>(size, 0));
+    if (size == 1) {
+        C[0][0] = A[0][0] * B[0][0];
+        return C;
+    }
+
+    int newSize = size / 2;
+    MatrixS A11(newSize, vector<int>(newSize)), A12(newSize, vector<int>(newSize)),
+        A21(newSize, vector<int>(newSize)), A22(newSize, vector<int>(newSize)),
+        B11(newSize, vector<int>(newSize)), B12(newSize, vector<int>(newSize)),
+        B21(newSize, vector<int>(newSize)), B22(newSize, vector<int>(newSize));
+
+    for (int i = 0; i < newSize; i++)
+        for (int j = 0; j < newSize; j++) {
+            A11[i][j] = A[i][j];
+            A12[i][j] = A[i][j + newSize];
+            A21[i][j] = A[i + newSize][j];
+            A22[i][j] = A[i + newSize][j + newSize];
+
+            B11[i][j] = B[i][j];
+            B12[i][j] = B[i][j + newSize];
+            B21[i][j] = B[i + newSize][j];
+            B22[i][j] = B[i + newSize][j + newSize];
+        }
+
+    MatrixS P1, P2, P3, P4, P5, P6, P7, P8;
+
+    #pragma omp parallel sections
+    {
+        #pragma omp section
+                { P1 = multiplicar_recursivo(A11, B11); }
+
+        #pragma omp section
+                { P2 = multiplicar_recursivo(A12, B21); }
+
+        #pragma omp section
+                { P3 = multiplicar_recursivo(A11, B12); }
+
+        #pragma omp section
+                { P4 = multiplicar_recursivo(A12, B22); }
+
+        #pragma omp section
+                { P5 = multiplicar_recursivo(A21, B11); }
+
+        #pragma omp section
+                { P6 = multiplicar_recursivo(A22, B21); }
+
+        #pragma omp section
+                { P7 = multiplicar_recursivo(A21, B12); }
+
+        #pragma omp section
+                { P8 = multiplicar_recursivo(A22, B22); }
+    }
+
+    MatrixS C11 = sumar(P1, P2);
+    MatrixS C12 = sumar(P3, P4);
+    MatrixS C21 = sumar(P5, P6);
+    MatrixS C22 = sumar(P7, P8);
+
+    for (int i = 0; i < newSize; ++i)
+        for (int j = 0; j < newSize; ++j) {
+            C[i][j] = C11[i][j];
+            C[i][j + newSize] = C12[i][j];
+            C[i + newSize][j] = C21[i][j];
+            C[i + newSize][j + newSize] = C22[i][j];
+        }
+
+    return C;
+}
+
 
 int main() {
     // por simplicidad se asumen matrices cuadradas
@@ -358,7 +430,12 @@ int main() {
     cout << " tiempo multiplicacion " << tstrassen << " ns " << tstrassen / 1000000000.0 << " s" << endl;
     //cout << "matriz C" << endl;
     //imprimirMatriz(matrix_C, rows, rows);
-
+     cout << "Recursivo Paralelo" << endl;
+     auto start5 = chrono::steady_clock::now();
+     vC = multiplicar_recursivo_paralelo(vA, vB);
+     auto end5 = chrono::steady_clock::now();
+     auto trecursivo_paralelo = chrono::duration_cast<chrono::nanoseconds>(end5 - start5).count();
+     cout << " tiempo multiplicacion " << trecursivo << " ns " << trecursivo / 1000000000.0 << " s" << endl;
     borrarMatriz(matrix_A, rows);
     borrarMatriz(matrix_B, cols);
     borrarMatriz(matrix_C, rows);
@@ -368,4 +445,4 @@ int main() {
     return 0;
 }
 
-//comentario para hacer un commit
+//comentario para hacer un commit no entendí =(
