@@ -1,4 +1,4 @@
-﻿#include <iostream>
+#include <iostream>
 #include <chrono>
 #include <omp.h>
 #include <vector>
@@ -44,9 +44,9 @@ MatrixS crear_matriz_vector(int size, int k) {
     for (int i = 0; i < size; i++)
         for (int j = 0; j < size; j++)
             matrix[i][j] = (i + k) * (j + k);  
+
     return matrix;
 }
-
 
 void imprimirMatriz(int** matrix, int rows, int cols) {
     for (int i = 0; i < rows; i++) {
@@ -446,10 +446,78 @@ MatrixS multiplicar_strassen_paralelo(const MatrixS& A, const MatrixS& B) {
 }
 
 
+void experimento_secuencial(int** A, int** B, int rows, int cols) {
+    cout << "SECUENCIAL" << endl;
+    auto start = chrono::steady_clock::now();
+    int **matrix_C = multiplicar_secuencial(A, B, rows, cols);
+    auto end = chrono::steady_clock::now();
+    auto tsecuencial = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
+    cout << " tiempo multiplicacion " << tsecuencial / 1000000.0 << " ms" << endl;
+    borrarMatriz(matrix_C, rows);
+}
+
+void experimento_paralelo(int** A, int** B, int rows, int cols) {
+    cout << "PARALELO" << endl;
+    auto start1 = chrono::steady_clock::now();
+    int** matrix_C = multiplicar_paralelo(A, B, rows, cols);
+    auto end1 = chrono::steady_clock::now();
+    auto tparalelo = chrono::duration_cast<chrono::nanoseconds>(end1 - start1).count();
+    cout << " tiempo multiplicacion " << tparalelo / 1000000.0 << " ms" << endl;
+    borrarMatriz(matrix_C, rows);
+}
+
+void experimento_cache(int* A, int* B, int cols, int rows) {
+    cout << "CACHE" << endl;
+    auto start2 = chrono::steady_clock::now();
+    int* C = multiplicar_cache(A, B, rows, cols);
+    auto end2 = chrono::steady_clock::now();
+    auto tcache = chrono::duration_cast<chrono::nanoseconds>(end2 - start2).count();
+    cout << " tiempo multiplicacion " << tcache / 1000000.0 << " ms" << endl;
+    delete[] C;
+}
+
+void experimento_recursivo(const MatrixS& A, const MatrixS& B) {
+    cout << "Recursivo" << endl;
+    auto start3 = chrono::steady_clock::now();
+    MatrixS vC = multiplicar_recursivo(A, B);
+    auto end3 = chrono::steady_clock::now();
+    auto trecursivo = chrono::duration_cast<chrono::nanoseconds>(end3 - start3).count();
+    cout << " tiempo multiplicacion " << trecursivo / 1000000.0 << " ms" << endl;
+}
+
+void experimento_strassen(const MatrixS& A, const MatrixS& B) {
+    cout << "Strassen" << endl;
+    auto start4 = chrono::steady_clock::now();
+    MatrixS vC = multiplicar_strassen(A, B);
+    auto end4 = chrono::steady_clock::now();
+    auto tstrassen = chrono::duration_cast<chrono::nanoseconds>(end4 - start4).count();
+    cout << " tiempo multiplicacion " << tstrassen / 1000000.0 << " ms" << endl;
+
+}
+
+void experimento_recursivo_paralelo(const MatrixS& A, const MatrixS& B) {
+
+    cout << "Recursivo Paralelo" << endl;
+    auto start5 = chrono::steady_clock::now();
+    MatrixS vC = multiplicar_recursivo_paralelo(A, B);
+    auto end5 = chrono::steady_clock::now();
+    auto trecursivo_paralelo = chrono::duration_cast<chrono::nanoseconds>(end5 - start5).count();
+    cout << " tiempo multiplicacion " << trecursivo_paralelo / 1000000.0 << " ms" << endl;
+
+}
+
+void experimento_strassen_paralelo(const MatrixS& A, const MatrixS& B) {
+    cout << "Strassen Paralelo" << endl;
+    auto start6 = chrono::steady_clock::now();
+    MatrixS vC = multiplicar_strassen_paralelo(A, B);
+    auto end6 = chrono::steady_clock::now();
+    auto tstrassen_paralelo = chrono::duration_cast<chrono::nanoseconds>(end6 - start6).count();
+    cout << " tiempo multiplicacion " << tstrassen_paralelo / 1000000.0 << " ms" << endl;
+}
 
 int main() {
     // por simplicidad se asumen matrices cuadradas
-    int rows = 16;
+    int rows = 4;
     int cols = rows;
     //se crean matrices con los mismos valores para A y B pero distintas estructuras según el enfoque
     int** matrix_A = crearMatriz(rows, cols, 1);
@@ -459,69 +527,30 @@ int main() {
     MatrixS vA = crear_matriz_vector(rows, 1);
     MatrixS vB = crear_matriz_vector(rows, 2);
 
-    //cout << "matriz A"<<endl;
-    //imprimirMatriz(matrix_A, rows, cols);
-    //cout << "matriz B" << endl;
-    //imprimirMatriz(matrix_B, cols, rows);
 
-    cout << "SECUENCIAL" << endl;
-    auto start = chrono::steady_clock::now();
-    int** matrix_C = multiplicar_secuencial(matrix_A, matrix_B, rows, cols);
-    auto end = chrono::steady_clock::now();
-    auto tsecuencial = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
-    cout << " tiempo multiplicacion " << tsecuencial << " ns " << tsecuencial / 1000000000.0 << " s" << endl;
-    
-    cout << "PARALELO" << endl;
-    auto start1 = chrono::steady_clock::now();
-    matrix_C = multiplicar_paralelo(matrix_A, matrix_B, rows, cols);
-    auto end1 = chrono::steady_clock::now();
-    auto tparalelo = chrono::duration_cast<chrono::nanoseconds>(end1 - start1).count();
-    cout << " tiempo multiplicacion " << tparalelo << " ns " << tparalelo / 1000000000.0 << " s" << endl;
-    
-    cout << "CACHE" << endl;
-    auto start2 = chrono::steady_clock::now();
-    int* C = multiplicar_cache(A, B, rows, cols);
-    auto end2 = chrono::steady_clock::now();
-    auto tcache = chrono::duration_cast<chrono::nanoseconds>(end2 - start2).count();
-    cout << " tiempo multiplicacion " << tcache << " ns " << tcache / 1000000000.0 << " s" << endl;
-    
-    cout << "Recursivo" << endl;
-    auto start3 = chrono::steady_clock::now();
-    MatrixS vC = multiplicar_recursivo(vA,vB);
-    auto end3 = chrono::steady_clock::now();
-    auto trecursivo = chrono::duration_cast<chrono::nanoseconds>(end3 - start3).count();
-    cout << " tiempo multiplicacion " << trecursivo << " ns " << trecursivo / 1000000000.0 << " s" << endl;
 
-    cout << "Strassen" << endl;
-    auto start4 = chrono::steady_clock::now();
-    vC = multiplicar_strassen(vA, vB);
-    auto end4 = chrono::steady_clock::now();
-    auto tstrassen = chrono::duration_cast<chrono::nanoseconds>(end4 - start4).count();
-    cout << " tiempo multiplicacion " << tstrassen << " ns " << tstrassen / 1000000000.0 << " s" << endl;
-    //cout << "matriz C" << endl;
-    //imprimirMatriz(matrix_C, rows, rows);
+ 
+    experimento_secuencial(matrix_A, matrix_B, rows, cols);
     
-    cout << "Recursivo Paralelo" << endl;
-    auto start5 = chrono::steady_clock::now();
-    vC = multiplicar_recursivo_paralelo(vA, vB);
-    auto end5 = chrono::steady_clock::now();
-    auto trecursivo_paralelo = chrono::duration_cast<chrono::nanoseconds>(end5 - start5).count();
-    cout << " tiempo multiplicacion " << trecursivo << " ns " << trecursivo / 1000000000.0 << " s" << endl;
-    
-    cout << "Strassen Paralelo" << endl;
-    auto start6 = chrono::steady_clock::now();
-    vC = multiplicar_strassen_paralelo(vA, vB);
-    auto end6 = chrono::steady_clock::now();
-    auto tstrassen_paralelo = chrono::duration_cast<chrono::nanoseconds>(end6 - start6).count();
-    cout << " tiempo multiplicacion " << tstrassen_paralelo << " ns " << tstrassen_paralelo / 1000000000.0 << " s" << endl;
-    
+    experimento_paralelo(matrix_A, matrix_B, rows, cols);
+
+    experimento_cache(A, B, rows, cols);
+
+    experimento_recursivo(vA,vB);
+
+    experimento_strassen(vA, vB);
+
+    experimento_recursivo_paralelo(vA, vB);
+
+    experimento_strassen_paralelo(vA, vB);
+   
     borrarMatriz(matrix_A, rows);
     borrarMatriz(matrix_B, cols);
-    borrarMatriz(matrix_C, rows);
+    
+
     delete[] A;
     delete[] B;
-    delete[] C;
+
+
     return 0;
 }
-
-//comentario para hacer un commit no entendí =(
