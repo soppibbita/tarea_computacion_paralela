@@ -2,6 +2,7 @@
 #include <chrono>
 #include <omp.h>
 #include <vector>
+#include <cmath>
 
 using namespace std;
 
