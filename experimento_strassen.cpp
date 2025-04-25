@@ -673,23 +673,77 @@ void experimento_recursivo() {
     tiempos.close();
 }
 
-void experimento_strassen(const MatrixS& A, const MatrixS& B) {
-    cout << "Strassen" << endl;
-    auto start4 = chrono::steady_clock::now();
-    MatrixS vC = multiplicar_strassen(A, B);
-    auto end4 = chrono::steady_clock::now();
-    auto tstrassen = chrono::duration_cast<chrono::nanoseconds>(end4 - start4).count();
-    cout << " tiempo multiplicacion " << tstrassen / 1000000.0 << " ms" << endl;
+void experimento_strassen() {
+    list<int> n_experimentos;
+    list<double> t_ejecucion;
+
+    // Creacion de archivos para guardar los resultados
+    ofstream tamano("tamano_strassen.txt");
+    ofstream tiempos("tiempos_strassen.txt");
+    for (int i = 2; i < 12; i++) {
+        // por simplicidad se asumen matrices cuadradas
+        int rows = pow(2, i);
+        //se crean matrices con los mismos valores para A y B pero distintas estructuras según el enfoque
+        MatrixS A = crear_matriz_vector(rows, 1);
+        MatrixS B = crear_matriz_vector(rows, 2);
+        int contador = 0;
+        while (contador < 10) {
+            auto start3 = chrono::steady_clock::now();
+            MatrixS C = multiplicar_strassen(A, B);
+            auto end3 = chrono::steady_clock::now();
+            auto tstrassen = chrono::duration_cast<chrono::nanoseconds>(end3 - start3).count();
+            contador++;
+            n_experimentos.insert(n_experimentos.end(), rows);
+            t_ejecucion.insert(t_ejecucion.end(), tstrassen);
+        }
+
+    }
+
+    for (auto i : n_experimentos) {
+        tamano << i << endl;
+    }
+    for (auto i : t_ejecucion) {
+        tiempos << i << endl;
+    }
+    tamano.close();
+    tiempos.close();
 }
 
-void experimento_recursivo_paralelo(const MatrixS& A, const MatrixS& B) {
+void experimento_recursivo_paralelo() {
 
-    cout << "Recursivo Paralelo" << endl;
-    auto start5 = chrono::steady_clock::now();
-    MatrixS vC = multiplicar_recursivo_paralelo(A, B);
-    auto end5 = chrono::steady_clock::now();
-    auto trecursivo_paralelo = chrono::duration_cast<chrono::nanoseconds>(end5 - start5).count();
-    cout << " tiempo multiplicacion " << trecursivo_paralelo / 1000000.0 << " ms" << endl;
+    list<int> n_experimentos;
+    list<double> t_ejecucion;
+
+    // Creacion de archivos para guardar los resultados
+    ofstream tamano("tamano_recursivo2.txt");
+    ofstream tiempos("tiempos_recursivo2.txt");
+    for (int i = 2; i < 12; i++) {
+        // por simplicidad se asumen matrices cuadradas
+        int rows = pow(2, i);
+        //se crean matrices con los mismos valores para A y B pero distintas estructuras según el enfoque
+        MatrixS A = crear_matriz_vector(rows, 1);
+        MatrixS B = crear_matriz_vector(rows, 2);
+        int contador = 0;
+        while (contador < 10) {
+            auto start3 = chrono::steady_clock::now();
+            MatrixS C = multiplicar_recursivo(A, B);
+            auto end3 = chrono::steady_clock::now();
+            auto trecursivo = chrono::duration_cast<chrono::nanoseconds>(end3 - start3).count();
+            contador++;
+            n_experimentos.insert(n_experimentos.end(), rows);
+            t_ejecucion.insert(t_ejecucion.end(), trecursivo);
+        }
+
+    }
+
+    for (auto i : n_experimentos) {
+        tamano << i << endl;
+    }
+    for (auto i : t_ejecucion) {
+        tiempos << i << endl;
+    }
+    tamano.close();
+    tiempos.close();
 }
 
 void experimento_strassen_paralelo(const MatrixS& A, const MatrixS& B) {
@@ -712,12 +766,12 @@ int main() {
 
     //experimento_paralelo();
 
-    cout << "RECURSIVO" << endl;
+    cout << "STRASSEN" << endl;
     //experimento_cache();
     //experimento_cache2();
-    experimento_recursivo();
-
-    //experimento_strassen(vA, vB);
+    //experimento_recursivo();
+    //experimento_recursivo_paralelo()
+    experimento_strassen();
 
     //experimento_recursivo_paralelo(vA, vB);
 
