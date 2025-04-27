@@ -28,17 +28,14 @@ int main() {
 
     experimento_secuencial();
     experimento_paralelo();
-    cout << "STRASSEN" << endl;
+    //cout << "STRASSEN" << endl;
     experimento_cache();
     experimento_cache2();
     experimento_recursivo();
     experimento_recursivo_paralelo();
     experimento_strassen();
     experimento_recursivo_paralelo();
-    experimento_strassen_paralelo(vA, vB);
-
-    delete[] A;
-    delete[] B;
+    experimento_strassen_paralelo();
 
 
     return 0;
