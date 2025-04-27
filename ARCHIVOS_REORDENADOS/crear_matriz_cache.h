@@ -9,7 +9,6 @@
 #include <filesystem>
 #include <cmath>
 
-
 using namespace std;
 
 using MatrixS = vector<vector<int>>;

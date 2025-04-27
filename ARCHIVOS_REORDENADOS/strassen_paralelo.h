@@ -145,3 +145,12 @@ MatrixS multiplicar_strassen_paralelo(const MatrixS& A, const MatrixS& B) {
 
     return C;
 }
+
+void experimento_strassen_paralelo(const MatrixS& A, const MatrixS& B) {
+    cout << "Strassen Paralelo" << endl;
+    auto start6 = chrono::steady_clock::now();
+    MatrixS vC = multiplicar_strassen_paralelo(A, B);
+    auto end6 = chrono::steady_clock::now();
+    auto tstrassen_paralelo = chrono::duration_cast<chrono::nanoseconds>(end6 - start6).count();
+    cout << " tiempo multiplicacion " << tstrassen_paralelo / 1000000.0 << " ms" << endl;
+}
