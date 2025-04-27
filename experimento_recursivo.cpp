@@ -556,7 +556,6 @@ void experimento_paralelo() {
     tiempos.close();
 }
 
-
 void experimento_cache() {
 
     list<int> n_experimentos;
