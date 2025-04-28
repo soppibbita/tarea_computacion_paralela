@@ -121,15 +121,15 @@ int** multiplicar_paralelo(int** A, int** B, int rows, int cols) {
     //}
 
     //multiplicar
-#pragma omp parallel for
-    for (int i = 0; i < rows; i++) {
-        for (int j = 0; j < rows; j++) {
-            matrix[i][j] = 0;
-            for (int k = 0; k < cols; k++) {
-                matrix[i][j] += A[i][k] * B[k][j];
+    #pragma omp parallel for
+        for (int i = 0; i < rows; i++) {
+            for (int j = 0; j < rows; j++) {
+                matrix[i][j] = 0;
+                for (int k = 0; k < cols; k++) {
+                    matrix[i][j] += A[i][k] * B[k][j];
+                }
             }
         }
-    }
     //auto end = chrono::steady_clock::now();
     //auto tinitns = chrono::duration_cast<chrono::nanoseconds>(end - start).count();
     //cout << " tiempo multiplicacion " << tinitns << " ns " << tinitns / 1000000000.0 << " s" << endl;
@@ -680,7 +680,7 @@ void experimento_strassen() {
     // Creacion de archivos para guardar los resultados
     ofstream tamano("tamano_strassen.txt");
     ofstream tiempos("tiempos_strassen.txt");
-    for (int i = 2; i < 12; i++) {
+    for (int i = 2; i < 10; i++) {
         // por simplicidad se asumen matrices cuadradas
         int rows = pow(2, i);
         //se crean matrices con los mismos valores para A y B pero distintas estructuras según el enfoque
@@ -717,7 +717,7 @@ void experimento_recursivo_paralelo() {
     // Creacion de archivos para guardar los resultados
     ofstream tamano("tamano_recursivo2.txt");
     ofstream tiempos("tiempos_recursivo2.txt");
-    for (int i = 2; i < 12; i++) {
+    for (int i = 2; i < 9; i++) {
         // por simplicidad se asumen matrices cuadradas
         int rows = pow(2, i);
         //se crean matrices con los mismos valores para A y B pero distintas estructuras según el enfoque
