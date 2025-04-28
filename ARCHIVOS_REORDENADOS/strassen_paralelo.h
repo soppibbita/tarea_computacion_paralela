@@ -16,6 +16,8 @@ using namespace std;
 
 using MatrixS = vector<vector<int>>;
 
+#ifndef _multiplicar_strassen
+#define _multiplicar_strassen
 // Multiplicacion con Strassen < O(n3)
 MatrixS multiplicar_strassen(const MatrixS& A, const MatrixS& B) {
     int size = A.size();
@@ -76,6 +78,7 @@ MatrixS multiplicar_strassen(const MatrixS& A, const MatrixS& B) {
 
     return C;
 }
+#endif
 
 MatrixS multiplicar_strassen_paralelo(const MatrixS& A, const MatrixS& B) {
     int size = A.size();

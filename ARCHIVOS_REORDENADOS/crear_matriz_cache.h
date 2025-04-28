@@ -1,3 +1,5 @@
+#ifndef _crear_matriz_cache_h
+#define _crear_matriz_cache_h
 #include <iostream>
 #include <chrono>
 #include <omp.h>
@@ -24,3 +26,4 @@ int* crearMatriz_cache(int rows, int cols, int k) {
     return matrix;
 
 }
+#endif

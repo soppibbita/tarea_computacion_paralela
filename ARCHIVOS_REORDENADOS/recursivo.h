@@ -17,6 +17,8 @@ using namespace std;
 
 using MatrixS = vector<vector<int>>;
 
+#ifndef _multiplicar_recursivo
+#define _multiplicar_recursivo
 //multiplicacion con recursivo
 MatrixS multiplicar_recursivo(const MatrixS& A, const MatrixS& B) {
     int size = A.size();
@@ -80,6 +82,7 @@ MatrixS multiplicar_recursivo(const MatrixS& A, const MatrixS& B) {
 
     return C;
 }
+#endif
 
 void experimento_recursivo() {
     list<int> n_experimentos;

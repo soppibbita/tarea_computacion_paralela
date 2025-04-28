@@ -16,6 +16,8 @@ using namespace std;
 
 using MatrixS = vector<vector<int>>;
 
+#ifndef _multiplicar_recursivo
+#define _multiplicar_recursivo
 MatrixS multiplicar_recursivo(const MatrixS& A, const MatrixS& B) {
     int size = A.size();
     MatrixS C(size, vector<int>(size, 0));
@@ -78,6 +80,7 @@ MatrixS multiplicar_recursivo(const MatrixS& A, const MatrixS& B) {
 
     return C;
 }
+#endif
 
 MatrixS multiplicar_recursivo_paralelo(const MatrixS& A, const MatrixS& B) {
     int size = A.size();

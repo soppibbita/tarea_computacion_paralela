@@ -1,3 +1,5 @@
+#ifndef _restar_matriz_h
+#define _restar_matriz_h
 #include <iostream>
 #include <chrono>
 #include <omp.h>
@@ -23,3 +25,5 @@ MatrixS restar(const MatrixS& A, const MatrixS& B) {
             C[i][j] = A[i][j] - B[i][j];
     return C;
 }
+
+#endif

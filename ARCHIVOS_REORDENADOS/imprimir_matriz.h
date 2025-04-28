@@ -1,3 +1,5 @@
+#ifndef _imprimir_matriz_h
+#define _imprimir_matriz_h
 #include <iostream>
 #include <chrono>
 #include <omp.h>
@@ -22,3 +24,5 @@ void imprimirMatriz(int** matrix, int rows, int cols) {
         cout << endl;
     }
 }
+
+#endif

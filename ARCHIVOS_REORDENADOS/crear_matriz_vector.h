@@ -1,3 +1,5 @@
+#ifndef _crear_matriz_vector_h
+#define _crear_matriz_vector_h
 #include <iostream>
 #include <chrono>
 #include <omp.h>
@@ -22,3 +24,4 @@ MatrixS crear_matriz_vector(int size, int k) {
 
     return matrix;
 }
+#endif

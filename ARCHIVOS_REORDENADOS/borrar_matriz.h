@@ -1,3 +1,5 @@
+#ifndef _borrar_matriz_h
+#define _borrar_matriz_h
 #include <iostream>
 #include <chrono>
 #include <omp.h>
@@ -21,3 +23,5 @@ void borrarMatriz(int** matrix, int rows) {
     }
     delete[] matrix; //libera la memoria de los punteros en matrix
 }
+
+#endif

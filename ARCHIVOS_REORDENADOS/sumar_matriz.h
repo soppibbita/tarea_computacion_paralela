@@ -1,3 +1,5 @@
+#ifndef _sumar_matriz_h
+#define _sumar_matriz_h
 #include <iostream>
 #include <chrono>
 #include <omp.h>
@@ -23,3 +25,5 @@ MatrixS sumar(const MatrixS& A, const MatrixS& B) {
             C[i][j] = A[i][j] + B[i][j];
     return C;
 }
+
+#endif
