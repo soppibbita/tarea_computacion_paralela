@@ -743,7 +743,7 @@ int main() {
     //experimento_cache();
     //experimento_cache2();
     //experimento_recursivo();
-    experimento_recursivo_paralelo()
+    experimento_recursivo_paralelo();
     //experimento_strassen(vA, vB);
 
     //experimento_recursivo_paralelo(vA, vB);

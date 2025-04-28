@@ -10,7 +10,6 @@
 #include <cmath>
 #include "sumar_matriz.h"
 #include "restar_matriz.h"
-#include "crear_matriz_vector.h"
 
 
 using namespace std;
@@ -78,38 +77,80 @@ MatrixS multiplicar_strassen(const MatrixS& A, const MatrixS& B) {
     return C;
 }
 
-void experimento_strassen() {
-    list<int> n_experimentos;
-    list<double> t_ejecucion;
+MatrixS multiplicar_strassen_paralelo(const MatrixS& A, const MatrixS& B) {
+    int size = A.size();
+    MatrixS C(size, vector<int>(size, 0));
+    if (size == 1) {
+        C[0][0] = A[0][0] * B[0][0];
+        return C;
+    }
 
-    // Creacion de archivos para guardar los resultados
-    ofstream tamano("tamano_strassen.txt");
-    ofstream tiempos("tiempos_strassen.txt");
-    for (int i = 2; i < 12; i++) {
-        // por simplicidad se asumen matrices cuadradas
-        int rows = pow(2, i);
-        //se crean matrices con los mismos valores para A y B pero distintas estructuras según el enfoque
-        MatrixS A = crear_matriz_vector(rows, 1);
-        MatrixS B = crear_matriz_vector(rows, 2);
-        int contador = 0;
-        while (contador < 10) {
-            auto start3 = chrono::steady_clock::now();
-            MatrixS C = multiplicar_strassen(A, B);
-            auto end3 = chrono::steady_clock::now();
-            auto tstrassen = chrono::duration_cast<chrono::nanoseconds>(end3 - start3).count();
-            contador++;
-            n_experimentos.insert(n_experimentos.end(), rows);
-            t_ejecucion.insert(t_ejecucion.end(), tstrassen);
+    int newSize = size / 2;
+    MatrixS A11(newSize, vector<int>(newSize)), A12(newSize, vector<int>(newSize)),
+        A21(newSize, vector<int>(newSize)), A22(newSize, vector<int>(newSize)),
+        B11(newSize, vector<int>(newSize)), B12(newSize, vector<int>(newSize)),
+        B21(newSize, vector<int>(newSize)), B22(newSize, vector<int>(newSize));
+
+    for (int i = 0; i < newSize; i++)
+        for (int j = 0; j < newSize; j++) {
+            A11[i][j] = A[i][j];
+            A12[i][j] = A[i][j + newSize];
+            A21[i][j] = A[i + newSize][j];
+            A22[i][j] = A[i + newSize][j + newSize];
+
+            B11[i][j] = B[i][j];
+            B12[i][j] = B[i][j + newSize];
+            B21[i][j] = B[i + newSize][j];
+            B22[i][j] = B[i + newSize][j + newSize];
         }
 
+    MatrixS M1, M2, M3, M4, M5, M6, M7;
+
+#pragma omp parallel sections
+    {
+#pragma omp section
+        { M1 = multiplicar_strassen(sumar(A11, A22), sumar(B11, B22)); }
+
+#pragma omp section
+        { M2 = multiplicar_strassen(sumar(A21, A22), B11); }
+
+#pragma omp section
+        { M3 = multiplicar_strassen(A11, restar(B12, B22)); }
+
+#pragma omp section
+        { M4 = multiplicar_strassen(A22, restar(B21, B11)); }
+
+#pragma omp section
+        { M5 = multiplicar_strassen(sumar(A11, A12), B22); }
+
+#pragma omp section
+        { M6 = multiplicar_strassen(restar(A21, A11), sumar(B11, B12)); }
+
+#pragma omp section
+        { M7 = multiplicar_strassen(restar(A12, A22), sumar(B21, B22)); }
     }
 
-    for (auto i : n_experimentos) {
-        tamano << i << endl;
-    }
-    for (auto i : t_ejecucion) {
-        tiempos << i << endl;
-    }
-    tamano.close();
-    tiempos.close();
+    MatrixS C11 = sumar(restar(sumar(M1, M4), M5), M7);
+    MatrixS C12 = sumar(M3, M5);
+    MatrixS C21 = sumar(M2, M4);
+    MatrixS C22 = sumar(restar(sumar(M1, M3), M2), M6);
+
+    for (int i = 0; i < newSize; i++)
+        for (int j = 0; j < newSize; j++) {
+            C[i][j] = C11[i][j];
+            C[i][j + newSize] = C12[i][j];
+            C[i + newSize][j] = C21[i][j];
+            C[i + newSize][j + newSize] = C22[i][j];
+        }
+
+    return C;
+}
+
+void experimento_strassen_paralelo(const MatrixS& A, const MatrixS& B) {
+    cout << "Strassen Paralelo" << endl;
+    auto start6 = chrono::steady_clock::now();
+    MatrixS vC = multiplicar_strassen_paralelo(A, B);
+    auto end6 = chrono::steady_clock::now();
+    auto tstrassen_paralelo = chrono::duration_cast<chrono::nanoseconds>(end6 - start6).count();
+    cout << " tiempo multiplicacion " << tstrassen_paralelo / 1000000.0 << " ms" << endl;
 }
