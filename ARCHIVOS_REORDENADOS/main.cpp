@@ -26,9 +26,9 @@ using MatrixS = vector<vector<int>>;
 
 int main() {
 
+
     experimento_secuencial();
     experimento_paralelo();
-    //cout << "STRASSEN" << endl;
     experimento_cache();
     experimento_cache2();
     experimento_recursivo();
