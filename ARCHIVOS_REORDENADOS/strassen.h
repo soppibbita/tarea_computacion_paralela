@@ -85,7 +85,7 @@ void experimento_strassen() {
     // Creacion de archivos para guardar los resultados
     ofstream tamano("tamano_strassen.txt");
     ofstream tiempos("tiempos_strassen.txt");
-    for (int i = 2; i < 12; i++) {
+    for (int i = 2; i < 10; i++) {
         // por simplicidad se asumen matrices cuadradas
         int rows = pow(2, i);
         //se crean matrices con los mismos valores para A y B pero distintas estructuras según el enfoque

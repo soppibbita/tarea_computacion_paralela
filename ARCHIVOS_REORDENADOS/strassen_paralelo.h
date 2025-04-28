@@ -16,7 +16,7 @@ using namespace std;
 
 using MatrixS = vector<vector<int>>;
 
-// Multiplicacion con Strassen < O(n3) cómo mido el tiempo en la recursividad ? este también debería paralelizarlo 
+// Multiplicacion con Strassen < O(n3)
 MatrixS multiplicar_strassen(const MatrixS& A, const MatrixS& B) {
     int size = A.size();
     MatrixS C(size, vector<int>(size, 0));
@@ -106,29 +106,29 @@ MatrixS multiplicar_strassen_paralelo(const MatrixS& A, const MatrixS& B) {
 
     MatrixS M1, M2, M3, M4, M5, M6, M7;
 
-#pragma omp parallel sections
+    #pragma omp parallel sections
     {
-#pragma omp section
-        { M1 = multiplicar_strassen(sumar(A11, A22), sumar(B11, B22)); }
+        #pragma omp section
+            { M1 = multiplicar_strassen(sumar(A11, A22), sumar(B11, B22)); }
 
-#pragma omp section
-        { M2 = multiplicar_strassen(sumar(A21, A22), B11); }
+        #pragma omp section
+            { M2 = multiplicar_strassen(sumar(A21, A22), B11); }
 
-#pragma omp section
-        { M3 = multiplicar_strassen(A11, restar(B12, B22)); }
+        #pragma omp section
+                { M3 = multiplicar_strassen(A11, restar(B12, B22)); }
 
-#pragma omp section
-        { M4 = multiplicar_strassen(A22, restar(B21, B11)); }
+        #pragma omp section
+                { M4 = multiplicar_strassen(A22, restar(B21, B11)); }
 
-#pragma omp section
-        { M5 = multiplicar_strassen(sumar(A11, A12), B22); }
+        #pragma omp section
+                { M5 = multiplicar_strassen(sumar(A11, A12), B22); }
 
-#pragma omp section
-        { M6 = multiplicar_strassen(restar(A21, A11), sumar(B11, B12)); }
+        #pragma omp section
+                { M6 = multiplicar_strassen(restar(A21, A11), sumar(B11, B12)); }
 
-#pragma omp section
-        { M7 = multiplicar_strassen(restar(A12, A22), sumar(B21, B22)); }
-    }
+        #pragma omp section
+                { M7 = multiplicar_strassen(restar(A12, A22), sumar(B21, B22)); }
+            }
 
     MatrixS C11 = sumar(restar(sumar(M1, M4), M5), M7);
     MatrixS C12 = sumar(M3, M5);
@@ -147,10 +147,38 @@ MatrixS multiplicar_strassen_paralelo(const MatrixS& A, const MatrixS& B) {
 }
 
 void experimento_strassen_paralelo(const MatrixS& A, const MatrixS& B) {
-    cout << "Strassen Paralelo" << endl;
-    auto start6 = chrono::steady_clock::now();
-    MatrixS vC = multiplicar_strassen_paralelo(A, B);
-    auto end6 = chrono::steady_clock::now();
-    auto tstrassen_paralelo = chrono::duration_cast<chrono::nanoseconds>(end6 - start6).count();
-    cout << " tiempo multiplicacion " << tstrassen_paralelo / 1000000.0 << " ms" << endl;
+
+    list<int> n_experimentos;
+    list<double> t_ejecucion;
+
+    // Creacion de archivos para guardar los resultados
+    ofstream tamano("tamano_strassen_paralelo.txt");
+    ofstream tiempos("tiempos_strassen_paralelo.txt");
+    for (int i = 2; i < 10; i++) {
+        // por simplicidad se asumen matrices cuadradas
+        int rows = pow(2, i);
+        //se crean matrices con los mismos valores para A y B pero distintas estructuras según el enfoque
+        MatrixS A = crear_matriz_vector(rows, 1);
+        MatrixS B = crear_matriz_vector(rows, 2);
+        int contador = 0;
+        while (contador < 10) {
+            auto start3 = chrono::steady_clock::now();
+            MatrixS C = multiplicar_strassen_paralelo(A, B);
+            auto end3 = chrono::steady_clock::now();
+            auto tstrassen = chrono::duration_cast<chrono::nanoseconds>(end3 - start3).count();
+            contador++;
+            n_experimentos.insert(n_experimentos.end(), rows);
+            t_ejecucion.insert(t_ejecucion.end(), tstrassen);
+        }
+
+    }
+
+    for (auto i : n_experimentos) {
+        tamano << i << endl;
+    }
+    for (auto i : t_ejecucion) {
+        tiempos << i << endl;
+    }
+    tamano.close();
+    tiempos.close();
 }
