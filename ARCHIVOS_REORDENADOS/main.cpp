@@ -25,8 +25,6 @@ using namespace std;
 using MatrixS = vector<vector<int>>;
 
 int main() {
-
-
     experimento_secuencial();
     experimento_paralelo();
     experimento_cache();
