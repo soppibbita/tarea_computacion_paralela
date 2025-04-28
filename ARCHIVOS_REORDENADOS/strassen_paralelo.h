@@ -146,7 +146,7 @@ MatrixS multiplicar_strassen_paralelo(const MatrixS& A, const MatrixS& B) {
     return C;
 }
 
-void experimento_strassen_paralelo(const MatrixS& A, const MatrixS& B) {
+void experimento_strassen_paralelo() {
 
     list<int> n_experimentos;
     list<double> t_ejecucion;
